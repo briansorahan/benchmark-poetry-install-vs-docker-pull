@@ -1,0 +1,112 @@
+# Common Poetry commands:
+# 	poetry lock
+# 	poetry show --tree
+# 	poetry install
+
+# Common Taskipy tasks:
+# 	poetry run task format
+# 	poetry run task lint
+# 	poetry run task test
+
+# Install format-and-lint pre-commit hook:
+#   poetry run pre-commit install
+
+
+[tool.poetry]
+name = "benchmark-poetry-install-vs-docker-pull"
+version = "0.0.0-dev"
+description = ""
+authors = ["Prism ETL Chapter"]
+license = "Proprietary"
+repository = "https://github.com/enverus-ea/prism.etl.prefect.flows.db-ingest"
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: Other/Proprietary License",
+    "Operating System :: OS Independent"
+]
+
+
+# Taskipy: https://github.com/illBeRoy/taskipy/blob/master/README.md
+[tool.taskipy.tasks]
+format = "task format_isort && task format_black"
+format_isort = "isort db_ingest tests"
+format_black = "black db_ingest tests"
+lint = "task lint_black; task lint_flake8"
+lint_black = "task format_black --check"
+lint_flake8 = "flake8 db_ingest tests"
+test = "pytest --cov=db_ingest --cov-fail-under=35 --doctest-modules"
+test-ci = "task test --junitxml=test-output.xml --cov-report=xml"
+clean = "rm -rf dist/"
+
+
+# Version syntax: https://python-poetry.org/docs/versions/
+[tool.poetry.dependencies]
+python = "^3.8"
+
+azure-identity="^1.5.0"
+azure-keyvault = "^4.1.0"
+azure-storage-blob = "^12.8.0"
+azure-storage-file-datalake="^12.3.1"
+boto3 = "^1.17.46"
+# databricks-client = "^1.2.0"
+prefect = "^0.14.15"
+psycopg2-binary = "^2.8.6"
+requests = "^2"
+SQLAlchemy = "^1.4.6"
+gpudb = [
+    {python = "^3.8", url = "https://github.com/kineticadb/kinetica-api-python/archive/v7.1.3.3.tar.gz" },
+]
+
+
+# # Other dependencies from legacy db-ingest:
+# avro-python3 = "^1.8.2"
+# azure-storage-common = "^2.1.0"
+# kubejobsubmission = "^0.2"
+# numpy = "^1.12.1"
+# pandas = "^0.22.0"
+# scikit-learn = "^0.19.1"
+# scipy = "^0.18.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2"
+pytest-cov = "^2.11"
+taskipy = "^1.7"
+isort = "^5.8"
+black = "^21.5b1"
+flake8 = "^3.9"
+flake8-bugbear = "*"
+flake8-comprehensions = "*"
+flake8-isort = "*"
+pre-commit = "^2.12"
+
+[tool.poetry.scripts]
+db_ingest = "db_ingest.cli:main"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.black]
+target_version = ['py38']
+skip-string-normalization = true
+line-length = 120
+
+
+[tool.isort]
+profile = 'black'
+py_version = '38'
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+# Let black handle long-line wrapping
+line_length = 120
+
+
+[tool.coverage.paths]
+source = [ "./", "/src", "/home/vsts/work/*/s", "/Users/runner/work/*/s", "D:\\a\\*\\s" ]
